@@ -1,0 +1,151 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {},
+  "variables": {
+    "sadiagname": "[concat('sadiag', uniqueString(subscription().subscriptionId,resourceGroup().id))]",
+    "osdiskname": "[concat('disks_', 'srv_dc_', 'OsDisk_1_', uniqueString(subscription().subscriptionId))]",
+  },
+  "resources": [
+    {
+      "type": "Microsoft.Network/networkInterfaces",
+      "name": "srv-dc-nic",
+      "apiVersion": "2017-03-01",
+      "location": "westeurope",
+      "scale": null,
+      "properties": {
+        "ipConfigurations": [
+          {
+            "name": "ipconfig1",
+            "properties": {
+              "privateIPAddress": "10.5.1.4",
+              "privateIPAllocationMethod": "Dynamic",
+              "publicIPAddress": {
+                "id": "[resourceId('Microsoft.Network/publicIPAddresses', 'Srv-dc-pip')]"
+              },
+              "subnet": {
+                "id": "[concat(resourceId('Microsoft.Network/virtualNetworks', 'VNET'), '/subnets/defaultsubnet')]"
+              }
+            }
+          }
+        ],
+        "dnsSettings": {
+          "dnsServers": []
+        },
+        "enableIPForwarding": false
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/publicIPAddresses', 'Srv-dc-pip')]"
+      ]
+    },
+    {
+      "type": "Microsoft.Network/publicIPAddresses",
+      "name": "Srv-dc-pip",
+      "apiVersion": "2017-03-01",
+      "location": "westeurope",
+      "scale": null,
+      "properties": {
+        "publicIPAllocationMethod": "Dynamic",
+        "idleTimeoutInMinutes": 4
+      },
+      "dependsOn": []
+    },
+    {
+      "type": "Microsoft.Storage/storageAccounts",
+      "sku": {
+        "name": "Standard_LRS",
+        "tier": "Standard"
+      },
+      "kind": "Storage",
+      "name": "[variables('sadiagname')]",
+      "apiVersion": "2016-01-01",
+      "location": "westeurope",
+      "tags": {},
+      "scale": null,
+      "properties": {},
+      "dependsOn": []
+    },
+    {
+      "type": "Microsoft.Compute/virtualMachines",
+      "name": "srv-dc",
+      "apiVersion": "2016-04-30-preview",
+      "location": "westeurope",
+      "scale": null,
+      "properties": {
+        "hardwareProfile": {
+          "vmSize": "Standard_D2s_v3"
+        },
+        "osProfile": {
+          "computerName": "srv-dc",
+          "adminUsername": "admings",
+          "adminPassword": "O365PCDM@1O365"
+        },
+        "storageProfile": {
+          "imageReference": {
+            "publisher": "MicrosoftWindowsServer",
+            "offer": "WindowsServer",
+            "sku": "2016-Datacenter",
+            "version": "latest"
+          },
+          "osDisk": {
+            "osType": "Windows",
+            "caching": "ReadWrite",
+            "createOption": "FromImage",
+            "name": "[variables('osdiskname')]",
+            "managedDisk": {
+              "storageAccountType": "Standard_LRS"
+            }
+          },
+          "dataDisks": []
+        },
+        "networkProfile": {
+          "networkInterfaces": [
+            {
+              "id": "[resourceId('Microsoft.Network/networkInterfaces', 'srv-dc-nic')]"
+            }
+          ]
+        },
+        "diagnosticsProfile": {
+          "bootDiagnostics": {
+            "enabled": true,
+            "storageUri": "[concat('https', '://', variables('sadiagname'), '.blob.core.windows.net', '/')]"
+          }
+        }
+      },
+
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/networkInterfaces', 'srv-dc-nic')]",
+        "[resourceId('Microsoft.Storage/storageAccounts', variables('sadiagname'))]"
+      ]
+    },
+    {
+      "type": "Microsoft.Compute/virtualMachines/extensions",
+      "name": "srv-dc/Antivirus",
+      "apiVersion": "2016-04-30-preview",
+      "location": "westeurope",
+      "dependsOn": [
+        "[concat('Microsoft.Compute/virtualMachines/', 'srv-dc')]"
+      ],
+      "properties": {
+        "publisher": "Microsoft.Azure.Security",
+        "type": "IaaSAntimalware",
+        "typeHandlerVersion": "1.5",
+        "autoUpgradeMinorVersion": true,
+        "settings": {
+          "AntimalwareEnabled": "true",
+          "Exclusions": {
+            "Processes": "taskmgr.exe"
+          },
+          "RealtimeProtectionEnabled": "true",
+          "ScheduledScanSettings": {
+            "isEnabled": "true",
+            "scanType": "Quick",
+            "day": "7",
+            "time": "120"
+          }
+        },
+        "protectedSettings": null
+      }
+    }
+  ]
+}

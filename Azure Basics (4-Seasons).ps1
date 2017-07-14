@@ -1,7 +1,7 @@
 ﻿###
 # Create Password File & Store Credentials
-### nnnnjjjjjhhhhhh
-$PswdFileLocationCustomer = "C:\Users\gstaes\Demos\TenantPassword.txt" 
+### 
+$PswdFileLocationCustomer = "C:\Users\gstaes\Source\Repos\DemoGStaes\TenantPassword.txt" 
 read-host -assecurestring | convertfrom-securestring | out-file $PswdFileLocationCustomer 
 $UsernameTenant = "gunters@4-Seasons.be"
 $PasswordTenant = Get-Content $PswdFileLocationCustomer | ConvertTo-SecureString
@@ -53,19 +53,20 @@ $resourceGroup = Get-AzureRmResourceGroup -Name $resourceGroupName
 ###
 # Add Recovery Services Vault for BackUp via Template
 ###
-$templateFilePath = "C:\Users\gstaes\Demos\ExportedTemplate-RecoveryServicesBackUpVault.json"
+$templateFilePath = "C:\Users\gstaes\Source\Repos\DemoGStaes\ExportedTemplate-RecoveryServicesBackUpVault.json"
 New-AzureRmResourceGroupDeployment -ResourceGroupName $resourceGroupName -TemplateFile $templateFilePath;
-
 
 ###
 # Add Network  via Template
 ###
-$templateFilePath = "C:\Users\gstaes\Demos\ExportedTemplate-NEtwork.json"
+$templateFilePath = "C:\Users\gstaes\Source\Repos\DemoGStaes\ExportedTemplate-NEtwork.json"
+$#templateFilePath = "https://github.com/GunterStaes/DemoGStaes/blob/master/ExportedTemplate-Network.json"
 New-AzureRmResourceGroupDeployment -ResourceGroupName $resourceGroupName -TemplateFile $templateFilePath;
 
 ###
-# Add Azure SQL Database via Template
+# Add VM via Template
 ###
-$templateFilePath = "C:\Users\gstaes\Demos\ExportedTemplate-SQLDatabase.json"
+$templateFilePath = "C:\Users\gstaes\Source\Repos\DemoGStaes\ExportedTemplate-vm.json"
 New-AzureRmResourceGroupDeployment -ResourceGroupName $resourceGroupName -TemplateFile $templateFilePath;
+
 
