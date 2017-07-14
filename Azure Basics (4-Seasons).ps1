@@ -1,6 +1,6 @@
 ﻿###
 # Create Password File & Store Credentials
-### nnnnjjjjj
+### nnnnjjjjjhhhhhh
 $PswdFileLocationCustomer = "C:\Users\gstaes\Demos\TenantPassword.txt" 
 read-host -assecurestring | convertfrom-securestring | out-file $PswdFileLocationCustomer 
 $UsernameTenant = "gunters@4-Seasons.be"
