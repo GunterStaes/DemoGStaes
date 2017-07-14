@@ -1,0 +1,30 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "vaults_demogstaesrsv_name": {
+            "defaultValue": "demogstaesrsv",
+            "type": "String"
+        }
+    },
+    "variables": {},
+    "resources": [
+        {
+            "comments": "Generalized from resource: '/subscriptions/6e4a8d7b-b46c-486c-aff6-e8869e120661/resourceGroups/Demogstaes/providers/Microsoft.RecoveryServices/vaults/demogstaesrsv'.",
+            "type": "Microsoft.RecoveryServices/vaults",
+            "sku": {
+                "name": "RS0",
+                "tier": "Standard"
+            },
+            "name": "[parameters('vaults_demogstaesrsv_name')]",
+            "apiVersion": "2016-06-01",
+            "location": "westeurope",
+            "tags": {
+                "ManagedBy": "gstaespartnerorg"
+            },
+            "scale": null,
+            "properties": {},
+            "dependsOn": []
+        }
+    ]
+}
